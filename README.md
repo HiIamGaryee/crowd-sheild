@@ -1,7 +1,7 @@
 # crowd-sheild
 
-A coffee shop webpage which involved Web3 and AI by ---> Team COMPILE TIME CHAOS
-This project was created by React, Mui and cosmocloud (as backend). \
+**crowd-sheild** is a crowd-control dashboard built by **Team Can We Throw They Out The Window** that combines Web3 identity primitives and AI-driven analytics to provide real-time crowd monitoring, risk scoring, and automated recommendations.  
+Implemented with **React**, **MUI**, and **AWS** (backend), the project ingests sensor and event data to display live heatmaps, per-zone risk levels, trend forecasts, and operator alerts. \
 
 ## Available Scripts
 

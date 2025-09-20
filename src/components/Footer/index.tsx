@@ -1,14 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
 import { Box, Typography, TextField, Paper, Button } from "@mui/material";
-import {
-  EmailSubscribeParams,
-  postEmailSubscribe,
-} from "../../api/postEmailSubscribe";
-import { useAppMutation } from "../../hooks/useAppMutation";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+
 import * as Yup from "yup";
-import { useState } from "react";
 
 const Footer = () => {
   return (
@@ -28,7 +20,7 @@ const Footer = () => {
     >
       <Box sx={{ width: "100%", mt: 4, textAlign: "center" }}>
         <Typography variant="body2" sx={{ color: "white" }}>
-          © 2025 All rights reserved by Group Can We Throw They Out The Window
+          © 2025 All rights reserved by Team Can We Throw They Out The Window
           Now.
         </Typography>
       </Box>
