@@ -1,5 +1,5 @@
 import React from "react";
-import ErrorBg from "../assets/errorbg.jpeg";
+import ErrorBg from "../assets/errorbg.jpg";
 import { Box } from "@mui/material";
 
 const ErrorPage = () => {

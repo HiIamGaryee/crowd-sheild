@@ -4,7 +4,6 @@ import Home from "./pages/HomePage";
 import { AuthProvider } from "./AuthProvider";
 import Faq from "./pages/FaqPage";
 import WizardzPage from "./pages/landings/wizardz";
-import AboutUsPage from "./pages/AboutUs";
 import DashboardPage from "./pages/DashbaordPage";
 import WhatIfPage from "./pages/WhatIfPage";
 import HelpPage from "./pages/HelpPage";
@@ -27,7 +26,6 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />, // Set a default error element here
     children: [
       { path: "/", element: <Home /> },
-      { path: "/about-us", element: <AboutUsPage /> },
       { path: "/faq", element: <Faq /> },
       { path: "/wizardz", element: <WizardzPage /> },
 

@@ -3,7 +3,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { router } from "./routes";
-import { MovieProvider } from "./context/movie-context";
 import "./App.css";
 import { AuthProvider } from "./AuthProvider";
 import useMode from "./hooks/useMode";
@@ -18,9 +17,7 @@ function App() {
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <MovieProvider>
-            <RouterProvider router={router} />
-          </MovieProvider>
+          <RouterProvider router={router} />
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

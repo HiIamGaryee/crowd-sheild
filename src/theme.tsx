@@ -232,7 +232,7 @@ const getTheme = (mode: any) =>
             backgroundColor: mode === "light" ? "#FFFFFF" : "#f7f3f0", // White for light mode, original for dark mode
             padding: "24px",
             borderRadius: "16px",
-            height: "100%",
+            height: "auto",
             boxShadow:
               mode === "light"
                 ? "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
