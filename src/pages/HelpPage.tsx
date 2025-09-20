@@ -284,6 +284,7 @@ const HelpPage = () => {
                     sx={{
                       borderRadius: 3,
                       boxShadow: 2,
+                      height: "100%",
                       cursor: "pointer",
                       "&:hover": {
                         boxShadow: 4,
@@ -361,9 +362,8 @@ const HelpPage = () => {
             </Card>
           </Grid>
 
-          {/* Support Options & Quick Actions */}
+          {/* Support*/}
           <Grid item xs={12} lg={4}>
-            {/* Support Options */}
             <Card sx={{ borderRadius: 3, boxShadow: 2, mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3 }}>
@@ -411,37 +411,6 @@ const HelpPage = () => {
                     </Typography>
                   </Paper>
                 ))}
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3 }}>
-                  Quick Actions
-                </Typography>
-
-                <List>
-                  {quickActions.map((action, index) => (
-                    <ListItem
-                      key={index}
-                      sx={{
-                        px: 0,
-                        cursor: "pointer",
-                        borderRadius: 1,
-                        "&:hover": { bgcolor: "action.hover" },
-                      }}
-                    >
-                      <ListItemIcon>
-                        <HelpIcon color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={action}
-                        primaryTypographyProps={{ variant: "body2" }}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
               </CardContent>
             </Card>
           </Grid>

@@ -18,7 +18,7 @@ const Footer = () => {
         flexWrap: "wrap",
       }}
     >
-      <Box sx={{ width: "100%", mt: 4, textAlign: "center" }}>
+      <Box sx={{ width: "100%", textAlign: "center" }}>
         <Typography variant="body2" sx={{ color: "white" }}>
           © 2025 All rights reserved by Team Can We Throw They Out The Window
           Now.

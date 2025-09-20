@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -72,12 +72,17 @@ const DashboardSidebar = () => {
       >
         <Typography
           variant="h5"
+          onClick={() => navigate("/")}
           sx={{
             fontWeight: "bold",
             background: "linear-gradient(45deg, #1E3A8A, #3B82F6)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
+            cursor: "pointer",
+            "&:hover": {
+              opacity: 0.8,
+            },
           }}
         >
           Crowd Shield

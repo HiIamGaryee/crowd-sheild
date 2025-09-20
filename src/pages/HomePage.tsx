@@ -24,8 +24,10 @@ import {
   Speed,
   CheckCircle,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const faqData = [
     {
       question: "How does automatic job assignment work?",
@@ -149,6 +151,7 @@ const HomePage = () => {
               <Button
                 variant="contained"
                 size="large"
+                onClick={() => navigate("/dashboard")}
                 sx={{
                   px: 4,
                   py: 2,
@@ -170,6 +173,7 @@ const HomePage = () => {
                       p: 3,
                       borderRadius: 3,
                       boxShadow: 3,
+                      height: "100%",
                       "&:hover": {
                         transform: "translateY(-4px)",
                         transition: "transform 0.3s ease",
@@ -207,7 +211,12 @@ const HomePage = () => {
               managing assignments. Smart auto-assignment gives your team a
               blueprint for success.
             </Typography>
-            <Button variant="contained" size="large" sx={{ borderRadius: 3 }}>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate("/dashboard")}
+              sx={{ borderRadius: 3 }}
+            >
               Learn More
             </Button>
           </Box>
@@ -270,7 +279,12 @@ const HomePage = () => {
                   </Typography>
                 </Box>
               </Box>
-              <Button variant="contained" size="large" sx={{ borderRadius: 3 }}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => navigate("/dashboard")}
+                sx={{ borderRadius: 3 }}
+              >
                 Start Managing Events
               </Button>
             </Grid>
@@ -358,6 +372,7 @@ const HomePage = () => {
             <Button
               variant="contained"
               size="large"
+              onClick={() => navigate("/dashboard")}
               sx={{
                 bgcolor: "white",
                 color: "primary.main",
