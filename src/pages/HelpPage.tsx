@@ -17,6 +17,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Dialog,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -34,10 +35,16 @@ import {
   LiveHelp,
 } from "@mui/icons-material";
 import DashboardSidebar from "../components/DashboardSidebar";
+import AiBot from "../components/AiBot";
 import { useState } from "react";
 
 const HelpPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAiBotOpen, setIsAiBotOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const helpCategories = [
     {
@@ -205,19 +212,15 @@ const HelpPage = () => {
               variant="contained"
               startIcon={<LiveHelp />}
               sx={{ borderRadius: 2 }}
+              onClick={handleOpen}
             >
               Live Chat
             </Button>
-            <Button
-              variant="outlined"
-              startIcon={<ContactSupport />}
-              sx={{ borderRadius: 2 }}
-            >
-              Contact Support
-            </Button>
           </Box>
         </Box>
-
+        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+          <AiBot onClose={handleClose} />
+        </Dialog>
         {/* Hero Banner */}
         <Paper
           sx={{
@@ -385,6 +388,9 @@ const HelpPage = () => {
                         borderColor: "primary.main",
                       },
                     }}
+                    onClick={
+                      option.type === "Live Chat" ? handleOpen : undefined
+                    }
                   >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                       <Avatar sx={{ bgcolor: "primary.main" }}>
