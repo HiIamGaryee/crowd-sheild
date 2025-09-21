@@ -67,7 +67,6 @@ interface CrewStat {
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isNotificationClicked, setIsNotificationClicked] = useState(false);
   const [audienceStats, setAudienceStats] = useState<AudienceStats | null>(
     null
   );
@@ -80,39 +79,6 @@ const DashboardPage = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const handleNotificationClick = () => {
-    setIsNotificationClicked(!isNotificationClicked);
-  };
-
-  // const recentEvents = [
-  //   {
-  //     id: 1,
-  //     name: "Summer Music Festival",
-  //     status: "Active",
-  //     statusColor: "success",
-  //     attendees: "15,000",
-  //     crew: "45",
-  //     location: "Central Park",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Tech Conference 2024",
-  //     status: "Scheduled",
-  //     statusColor: "info",
-  //     attendees: "3,500",
-  //     crew: "25",
-  //     location: "Convention Center",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Sports Championship",
-  //     status: "Completed",
-  //     statusColor: "default",
-  //     attendees: "25,000",
-  //     crew: "60",
-  //     location: "Stadium Arena",
-  //   },
-  // ];
   // Manual refresh function
   const refreshData = async () => {
     try {
@@ -262,17 +228,7 @@ const DashboardPage = () => {
               size="small"
               sx={{ fontWeight: "bold" }}
             />
-            <IconButton
-              onClick={handleNotificationClick}
-              sx={{
-                color: isNotificationClicked ? "#FFD700" : "inherit", // Yellow when clicked
-                "&:hover": {
-                  backgroundColor: isNotificationClicked
-                    ? "rgba(255, 215, 0, 0.1)"
-                    : "action.hover",
-                },
-              }}
-            >
+            <IconButton>
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>
