@@ -31,6 +31,7 @@ import {
   Star as StarIcon,
   Chat as ChatIcon,
   Bolt as BoltIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
 } from "@mui/icons-material";
 
 interface IMessage {
@@ -56,7 +57,9 @@ const AiBot = ({ onClose }: AiBotProps) => {
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const chatHistory = [
     "How do I add crew members to my event?",
@@ -67,12 +70,31 @@ const AiBot = ({ onClose }: AiBotProps) => {
   ];
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isUserScrolling) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
+  // Handle scroll events to detect user scrolling
+  const handleScroll = () => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // 50px threshold
+      setIsUserScrolling(!isAtBottom);
+    }
+  };
+
+  // Only auto-scroll when new messages are added and user is not manually scrolling
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (!isUserScrolling) {
+      const timer = setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [messages.length, isUserScrolling]);
 
   const handleSend = async () => {
     if (!inputMessage.trim()) return;
@@ -186,6 +208,8 @@ const AiBot = ({ onClose }: AiBotProps) => {
 
         {/* Messages Area */}
         <Box
+          ref={messagesContainerRef}
+          onScroll={handleScroll}
           sx={{
             flexGrow: 1,
             overflow: "auto",
@@ -256,6 +280,36 @@ const AiBot = ({ onClose }: AiBotProps) => {
               </Paper>
             </Box>
           )}
+
+          {/* Scroll to bottom button */}
+          {isUserScrolling && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 80,
+                right: 20,
+                zIndex: 1000,
+              }}
+            >
+              <IconButton
+                onClick={() => {
+                  setIsUserScrolling(false);
+                  scrollToBottom();
+                }}
+                sx={{
+                  bgcolor: "primary.main",
+                  color: "white",
+                  boxShadow: 2,
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
+                }}
+              >
+                <KeyboardArrowDownIcon />
+              </IconButton>
+            </Box>
+          )}
+
           <div ref={messagesEndRef} />
         </Box>
 
