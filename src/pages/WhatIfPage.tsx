@@ -627,6 +627,7 @@ www.crowdshield.com
                         sx={{
                           p: 3,
                           borderRadius: 2,
+                          height: "100%",
                           border: "1px solid",
                           borderColor:
                             result.status === "critical"
