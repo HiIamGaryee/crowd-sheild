@@ -29,9 +29,14 @@ import { useState } from "react";
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isNotificationClicked, setIsNotificationClicked] = useState(false);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const handleNotificationClick = () => {
+    setIsNotificationClicked(!isNotificationClicked);
   };
 
   const recentEvents = [
@@ -183,7 +188,15 @@ const DashboardPage = () => {
               size="small"
               sx={{ fontWeight: "bold" }}
             />
-            <IconButton>
+            <IconButton 
+              onClick={handleNotificationClick}
+              sx={{
+                color: isNotificationClicked ? "#FFD700" : "inherit", // Yellow when clicked
+                "&:hover": {
+                  backgroundColor: isNotificationClicked ? "rgba(255, 215, 0, 0.1)" : "action.hover",
+                },
+              }}
+            >
               <Badge badgeContent={3} color="error">
                 <NotificationsIcon />
               </Badge>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -26,6 +26,7 @@ const drawerWidth = 280;
 
 const DashboardSidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -37,6 +38,18 @@ const DashboardSidebar = () => {
   const handleLogout = () => {
     // Navigate back to home page since we don't have logout function
     navigate("/");
+  };
+
+  const handleNavClick = (link: string) => {
+    navigate(link);
+    // Close mobile drawer when navigating
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
+  const isActiveRoute = (link: string) => {
+    return location.pathname === link;
   };
 
   const navItems = [
@@ -96,38 +109,46 @@ const DashboardSidebar = () => {
 
       {/* Navigation Items */}
       <List sx={{ flexGrow: 1, px: 2, py: 2 }}>
-        {navItems.map((item) => (
-          <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
-            <ListItemButton
-              component={Link}
-              to={item.link}
-              sx={{
-                borderRadius: 2,
-                "&.Mui-selected": {
-                  backgroundColor: "primary.main",
-                  color: "white",
+        {navItems.map((item) => {
+          const isActive = isActiveRoute(item.link);
+          return (
+            <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                onClick={() => handleNavClick(item.link)}
+                selected={isActive}
+                sx={{
+                  borderRadius: 2,
+                  backgroundColor: isActive ? "#87CEEB" : "transparent", // Light blue
+                  color: isActive ? "#1565C0" : "inherit", // Dark blue text for contrast
+                  "&.Mui-selected": {
+                    backgroundColor: "#87CEEB", // Light blue
+                    color: "#1565C0", // Dark blue text
+                    "&:hover": {
+                      backgroundColor: "#7BC8E8", // Slightly darker light blue on hover
+                    },
+                    "& .MuiListItemIcon-root": {
+                      color: "#1565C0", // Dark blue icon
+                    },
+                  },
                   "&:hover": {
-                    backgroundColor: "primary.dark",
+                    backgroundColor: isActive ? "#7BC8E8" : "action.hover", // Slightly darker light blue on hover when active
                   },
                   "& .MuiListItemIcon-root": {
-                    color: "white",
+                    color: isActive ? "#1565C0" : "inherit", // Dark blue icon when active
                   },
-                },
-                "&:hover": {
-                  backgroundColor: "action.hover",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
-              <ListItemText
-                primary={item.name}
-                primaryTypographyProps={{
-                  fontWeight: "medium",
                 }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemText
+                  primary={item.name}
+                  primaryTypographyProps={{
+                    fontWeight: "medium",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
 
       {/* Logout Section */}
