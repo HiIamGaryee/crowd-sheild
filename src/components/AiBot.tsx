@@ -216,7 +216,13 @@ const AiBot = ({ onClose }: AiBotProps) => {
                   position: "relative",
                 }}
               >
-                <Typography variant="body1" sx={{ mb: 1, color: "light" }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    mb: 1,
+                    color: message.sender === "user" ? "white" : "text.primary",
+                  }}
+                >
                   {message.message}
                 </Typography>
 

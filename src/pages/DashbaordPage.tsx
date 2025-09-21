@@ -85,20 +85,22 @@ const DashboardPage = () => {
       setLoading(true);
       console.log("🔄 Manually refreshing dashboard data...");
 
-      // Fetch all data in parallel
-      const [statsData, eventsData, alertsData, entryRushData] =
-        await Promise.all([
-          DashboardAPI.getAudienceStats(),
-          DashboardAPI.getRecentEvents(),
-          DashboardAPI.getAlerts(),
-          DashboardAPI.getEntryRush(),
-        ]);
+      // Fetch data in optimized order to avoid duplicate API calls
+      const [statsData, eventsData, entryRushData] = await Promise.all([
+        DashboardAPI.getAudienceStats(),
+        DashboardAPI.getRecentEvents(),
+        DashboardAPI.getEntryRush(),
+      ]);
+
+      // Generate alerts using the already fetched entry rush data
+      const alertsData = await DashboardAPI.getAlerts(entryRushData);
 
       setAudienceStats(statsData);
       setRecentEvents(eventsData);
       setAlerts(alertsData);
 
       console.log("📊 Recent Events Data:", eventsData);
+      console.log("🚨 Alerts Data:", alertsData);
 
       // Transform entry rush data into crew stats
       const crewStatsData = [
@@ -491,12 +493,17 @@ const DashboardPage = () => {
                       sx={{
                         bgcolor:
                           alert.type === "success"
-                            ? "safe.main"
+                            ? "success.main"
                             : alert.type === "warning"
                             ? "warning.main"
-                            : "critical.main",
+                            : alert.type === "error"
+                            ? "error.main"
+                            : alert.type === "info"
+                            ? "info.main"
+                            : "grey.500",
                         width: 32,
                         height: 32,
+                        fontSize: "16px",
                       }}
                     >
                       {alert.icon}
