@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:8000",
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.893.0",
     "@chatscope/chat-ui-kit-react": "^2.0.3",
     "@chatscope/chat-ui-kit-styles": "^1.4.0",
     "@emotion/react": "^11.11.1",

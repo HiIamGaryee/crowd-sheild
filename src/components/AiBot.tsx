@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import { callBedrockAI } from "../api/bedrockService";
 import {
   Close as CloseIcon,
   Send as SendIcon,
@@ -87,20 +88,31 @@ const AiBot = ({ onClose }: AiBotProps) => {
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
+    try {
+      // Call AWS Bedrock directly (no Python server needed!)
+      const aiResponse_text = await callBedrockAI(inputMessage);
+
       const aiResponse: IMessage = {
         id: (Date.now() + 1).toString(),
-        message:
-          "I understand you're asking about: " +
-          inputMessage +
-          ". Let me help you with that. This is a simulated response - in the real implementation, this would connect to your AI service.",
+        message: aiResponse_text,
         sender: "ai",
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, aiResponse]);
+    } catch (error) {
+      console.error("Error calling AWS Bedrock:", error);
+      const errorResponse: IMessage = {
+        id: (Date.now() + 1).toString(),
+        message:
+          "I'm sorry, I'm having trouble connecting to AWS Bedrock. Please check your AWS credentials.",
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {

@@ -16,7 +16,10 @@ const useMode = () => {
     });
   };
 
-  const theme: Theme = useMemo(() => getTheme(mode), [mode]);
+  const theme: Theme = useMemo(() => {
+    const themeObj = getTheme(mode);
+    return themeObj;
+  }, [mode]);
 
   // Add useEffect to apply the theme mode immediately when changed
   useEffect(() => {
