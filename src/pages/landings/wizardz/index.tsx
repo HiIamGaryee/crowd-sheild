@@ -245,7 +245,7 @@ const WizardzPage = () => {
         </Box>
         <Box sx={{ width: "100%", mt: 4, textAlign: "center" }}>
           <Typography variant="body2" sx={{ color: "white" }}>
-            © 2019 All rights reserved by Brewed in chaos Sdn Bhd.
+            © 2025 All rights reserved by Crowd Sheild.
           </Typography>
         </Box>
       </Box>
