@@ -20,105 +20,150 @@ import {
   Security,
   Assignment,
   Speed,
-  CheckCircle,
-  Warning,
-  Error,
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import DashboardSidebar from "../components/DashboardSidebar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import DashboardAPI from "../api/dashboardAPI";
+
+// Type definitions
+interface AudienceStats {
+  total_attendees: number;
+  entered: number;
+  not_entered: number;
+  exited: number;
+  zone_distribution: { [key: string]: number };
+  entry_rate: number;
+}
+
+interface RecentEvent {
+  id: number;
+  attendee: string;
+  zone: string;
+  time: string;
+  status: string;
+  name?: string;
+  location?: string;
+  attendees?: string;
+  crew?: string;
+  statusColor?: string;
+}
+
+interface Alert {
+  type: string;
+  message: string;
+  time: string;
+  icon: string;
+}
+
+interface CrewStat {
+  title: string;
+  value: number | string;
+  change: string;
+  changeType: string;
+  icon: React.ReactElement;
+  color: string;
+}
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [audienceStats, setAudienceStats] = useState<AudienceStats | null>(
+    null
+  );
+  const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [crewStats, setCrewStats] = useState<CrewStat[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const recentEvents = [
-    {
-      id: 1,
-      name: "Summer Music Festival",
-      status: "Active",
-      statusColor: "success",
-      attendees: "15,000",
-      crew: "45",
-      location: "Central Park",
-    },
-    {
-      id: 2,
-      name: "Tech Conference 2024",
-      status: "Scheduled",
-      statusColor: "info",
-      attendees: "3,500",
-      crew: "25",
-      location: "Convention Center",
-    },
-    {
-      id: 3,
-      name: "Sports Championship",
-      status: "Completed",
-      statusColor: "default",
-      attendees: "25,000",
-      crew: "60",
-      location: "Stadium Arena",
-    },
-  ];
+  // Manual refresh function
+  const refreshData = async () => {
+    try {
+      setLoading(true);
+      console.log("🔄 Manually refreshing dashboard data...");
 
-  const crewStats = [
-    {
-      title: "Active Crew Members",
-      value: "127",
-      change: "+12%",
-      changeType: "positive",
-      icon: <Groups sx={{ fontSize: 30 }} />,
-      color: "primary.main",
-    },
-    {
-      title: "Events This Month",
-      value: "23",
-      change: "+8%",
-      changeType: "positive",
-      icon: <Assignment sx={{ fontSize: 30 }} />,
-      color: "safe.main",
-    },
-    {
-      title: "Safety Score",
-      value: "98.5%",
-      change: "+2.1%",
-      changeType: "positive",
-      icon: <Security sx={{ fontSize: 30 }} />,
-      color: "safe.main",
-    },
-    {
-      title: "Response Time",
-      value: "2.3 min",
-      change: "-15%",
-      changeType: "positive",
-      icon: <Speed sx={{ fontSize: 30 }} />,
-      color: "accent.main",
-    },
-  ];
+      // Fetch all data in parallel
+      const [statsData, eventsData, alertsData, entryRushData] =
+        await Promise.all([
+          DashboardAPI.getAudienceStats(),
+          DashboardAPI.getRecentEvents(),
+          DashboardAPI.getAlerts(),
+          DashboardAPI.getEntryRush(),
+        ]);
 
-  const alerts = [
-    {
-      type: "warning",
-      message: "High crowd density detected at Zone A",
-      time: "2 minutes ago",
-      icon: <Warning />,
-    },
-    {
-      type: "success",
-      message: "Crew member John Doe checked in successfully",
-      time: "5 minutes ago",
-      icon: <CheckCircle />,
-    },
-    {
-      type: "error",
-      message: "Emergency protocol activated at Zone C",
-      time: "8 minutes ago",
-      icon: <Error />,
-    },
-  ];
+      setAudienceStats(statsData);
+      setRecentEvents(eventsData);
+      setAlerts(alertsData);
+
+      console.log("📊 Recent Events Data:", eventsData);
+
+      // Transform entry rush data into crew stats
+      const crewStatsData = [
+        {
+          title: "Gate A Crew",
+          value: entryRushData.A || 0,
+          change: "+12%",
+          changeType: "positive",
+          icon: <Groups sx={{ fontSize: 30 }} />,
+          color: "primary.main",
+        },
+        {
+          title: "Gate B Crew",
+          value: entryRushData.B || 0,
+          change: "+8%",
+          changeType: "positive",
+          icon: <Assignment sx={{ fontSize: 30 }} />,
+          color: "safe.main",
+        },
+        {
+          title: "Gate C Crew",
+          value: entryRushData.C || 0,
+          change: "+2.1%",
+          changeType: "positive",
+          icon: <Security sx={{ fontSize: 30 }} />,
+          color: "safe.main",
+        },
+        {
+          title: "Entry Rate",
+          value: `${statsData.entry_rate || 0}%`,
+          change: "-15%",
+          changeType: "positive",
+          icon: <Speed sx={{ fontSize: 30 }} />,
+          color: "accent.main",
+        },
+      ];
+      setCrewStats(crewStatsData);
+      console.log("✅ Dashboard data refreshed successfully");
+    } catch (error) {
+      console.error("Error refreshing dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data from API only once on page load
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Typography>Loading dashboard data...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -188,6 +233,27 @@ const DashboardPage = () => {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            <IconButton
+              onClick={refreshData}
+              disabled={loading}
+              title="Refresh Dashboard Data"
+              sx={{
+                color: loading ? "text.disabled" : "primary.main",
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              }}
+            >
+              <RefreshIcon
+                sx={{
+                  animation: loading ? "spin 1s linear infinite" : "none",
+                  "@keyframes spin": {
+                    "0%": { transform: "rotate(0deg)" },
+                    "100%": { transform: "rotate(360deg)" },
+                  },
+                }}
+              />
+            </IconButton>
             <IconButton onClick={toggleDarkMode}>
               <DarkModeIcon />
             </IconButton>
@@ -209,11 +275,18 @@ const DashboardPage = () => {
         >
           <Box sx={{ position: "relative", zIndex: 2 }}>
             <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-              Hi, John Doe
+              Event Dashboard - Kuala Lumpur Concert Hall
             </Typography>
             <Typography variant="h6" sx={{ mb: 3, opacity: 0.9 }}>
-              Welcome to your crowd control command center. Monitor events,
-              manage crew, and ensure safety across all venues.
+              {audienceStats ? (
+                <>
+                  Total Attendees: {audienceStats.total_attendees} | Entered:{" "}
+                  {audienceStats.entered} | Entry Rate:{" "}
+                  {audienceStats.entry_rate}%
+                </>
+              ) : (
+                "Welcome to your crowd control command center. Monitor events, manage crew, and ensure safety across all venues."
+              )}
             </Typography>
             <Button
               variant="contained"
@@ -327,59 +400,68 @@ const DashboardPage = () => {
                   </Button>
                 </Box>
 
-                {recentEvents.map((event) => (
-                  <Paper
-                    key={event.id}
-                    sx={{
-                      p: 3,
-                      mb: 2,
-                      borderRadius: 2,
-                      border: "1px solid",
-                      borderColor: "divider",
-                      "&:hover": {
-                        boxShadow: 2,
-                        borderColor: "primary.main",
-                      },
-                    }}
-                  >
-                    <Box
+                {recentEvents.length > 0 ? (
+                  recentEvents.map((event) => (
+                    <Paper
+                      key={event.id}
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        p: 3,
+                        mb: 2,
+                        borderRadius: 2,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        "&:hover": {
+                          boxShadow: 2,
+                          borderColor: "primary.main",
+                        },
                       }}
                     >
-                      <Box>
-                        <Typography
-                          variant="h6"
-                          sx={{ fontWeight: "bold", mb: 1 }}
-                        >
-                          {event.name}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 1 }}
-                        >
-                          📍 {event.location}
-                        </Typography>
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                          <Typography variant="body2">
-                            👥 {event.attendees} attendees
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: "bold", mb: 1 }}
+                          >
+                            {event.attendee}
                           </Typography>
-                          <Typography variant="body2">
-                            🛡️ {event.crew} crew members
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 1 }}
+                          >
+                            🎫 Zone: {event.zone}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            ⏰ {event.time}
                           </Typography>
                         </Box>
+                        <Chip
+                          label={event.status}
+                          color={
+                            event.status === "Entered"
+                              ? "success"
+                              : event.status === "Not Entered"
+                              ? "warning"
+                              : "default"
+                          }
+                          sx={{ fontWeight: "bold" }}
+                        />
                       </Box>
-                      <Chip
-                        label={event.status}
-                        color={event.statusColor as any}
-                        sx={{ fontWeight: "bold" }}
-                      />
-                    </Box>
-                  </Paper>
-                ))}
+                    </Paper>
+                  ))
+                ) : (
+                  <Box sx={{ textAlign: "center", py: 4 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      No recent events to display
+                    </Typography>
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
