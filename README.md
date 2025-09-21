@@ -3,7 +3,8 @@
 **crowd-sheild** is a crowd-control dashboard built by **Team Can We Throw They Out The Window** that combines AI-driven analytics to provide real-time crowd monitoring, risk scoring, and automated recommendations.  
 Implemented with **React**, **MUI**, and **AWS** (backend) \
 
-Check it :https://main.d3s85y6h708zec.amplifyapp.com/ \
+Check it out : https://main.d3s85y6h708zec.amplifyapp.com/
+Demo : https://youtu.be/iG5vEwthGC0
 
 ## Available Scripts
 
