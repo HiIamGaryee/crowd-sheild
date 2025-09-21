@@ -29,10 +29,49 @@ import {
 } from "@mui/icons-material";
 import DashboardSidebar from "../components/DashboardSidebar";
 import { useState } from "react";
+import DashboardAPI from "../api/dashboardAPI";
+
+// Type definitions
+interface WhatIfAnalysis {
+  situation: string;
+  estimated_count: number;
+  plan: string;
+}
+
+interface SimulationResult {
+  metric: string;
+  current: string;
+  simulated: string;
+  change: string;
+  status: string;
+}
 
 const WhatIfPage = () => {
   const [eventType, setEventType] = useState("");
   const [crowdSize, setCrowdSize] = useState("");
+  const [scenario, setScenario] = useState("");
+  const [analysisResult, setAnalysisResult] = useState<WhatIfAnalysis | null>(
+    null
+  );
+  const [loading, setLoading] = useState(false);
+
+  const runWhatIfAnalysis = async () => {
+    if (!scenario.trim()) {
+      alert("Please enter a scenario to analyze");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await DashboardAPI.getWhatIfAnalysis(scenario);
+      setAnalysisResult(result);
+    } catch (error) {
+      console.error("Error running what-if analysis:", error);
+      alert("Error running analysis. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const exportResultsToPDF = () => {
     // Create a simple text-based report
@@ -125,36 +164,80 @@ www.crowdshield.com
     },
   ];
 
-  const simulationResults = [
-    {
-      metric: "Evacuation Time",
-      current: "8.5 min",
-      simulated: "12.3 min",
-      change: "+45%",
-      status: "warning",
-    },
-    {
-      metric: "Crowd Density",
-      current: "0.7",
-      simulated: "0.9",
-      change: "+29%",
-      status: "critical",
-    },
-    {
-      metric: "Response Time",
-      current: "2.1 min",
-      simulated: "3.8 min",
-      change: "+81%",
-      status: "warning",
-    },
-    {
-      metric: "Safety Score",
-      current: "98.5%",
-      simulated: "87.2%",
-      change: "-11%",
-      status: "critical",
-    },
-  ];
+  // Generate simulation results based on analysis result
+  const getSimulationResults = (): SimulationResult[] => {
+    if (!analysisResult) {
+      return [
+        {
+          metric: "Evacuation Time",
+          current: "8.5 min",
+          simulated: "N/A",
+          change: "N/A",
+          status: "info",
+        },
+        {
+          metric: "Crowd Density",
+          current: "0.7",
+          simulated: "N/A",
+          change: "N/A",
+          status: "info",
+        },
+        {
+          metric: "Response Time",
+          current: "2.1 min",
+          simulated: "N/A",
+          change: "N/A",
+          status: "info",
+        },
+        {
+          metric: "Safety Score",
+          current: "98.5%",
+          simulated: "N/A",
+          change: "N/A",
+          status: "info",
+        },
+      ];
+    }
+
+    return [
+      {
+        metric: "Estimated Impact",
+        current: "Normal",
+        simulated: analysisResult.situation || "Unknown",
+        change: analysisResult.estimated_count
+          ? `+${analysisResult.estimated_count} people`
+          : "N/A",
+        status: analysisResult.estimated_count > 100 ? "critical" : "warning",
+      },
+      {
+        metric: "Response Plan",
+        current: "Standard Protocol",
+        simulated: analysisResult.plan ? "Custom Plan" : "N/A",
+        change: analysisResult.plan ? "Modified" : "N/A",
+        status: analysisResult.plan ? "success" : "info",
+      },
+      {
+        metric: "Crew Requirements",
+        current: "50 crew",
+        simulated: analysisResult.estimated_count
+          ? `${Math.ceil(analysisResult.estimated_count / 20)} crew`
+          : "N/A",
+        change: analysisResult.estimated_count
+          ? `+${Math.ceil(analysisResult.estimated_count / 20) - 50}`
+          : "N/A",
+        status: analysisResult.estimated_count > 100 ? "warning" : "success",
+      },
+      {
+        metric: "Safety Level",
+        current: "High",
+        simulated: analysisResult.estimated_count > 100 ? "Medium" : "High",
+        change: analysisResult.estimated_count > 100 ? "-1 level" : "No change",
+        status: analysisResult.estimated_count > 100 ? "warning" : "success",
+      },
+    ];
+  };
+
+  const simulationResults = getSimulationResults();
 
   const recommendations = [
     {
@@ -238,13 +321,19 @@ www.crowdshield.com
               variant="contained"
               startIcon={<PlayArrow />}
               sx={{ borderRadius: 2 }}
+              onClick={runWhatIfAnalysis}
+              disabled={loading}
             >
-              Run Simulation
+              {loading ? "Running Analysis..." : "Run Simulation"}
             </Button>
             <Button
               variant="outlined"
               startIcon={<Refresh />}
               sx={{ borderRadius: 2 }}
+              onClick={() => {
+                setScenario("");
+                setAnalysisResult(null);
+              }}
             >
               Reset
             </Button>
@@ -354,7 +443,9 @@ www.crowdshield.com
                     label="Custom Scenario"
                     multiline
                     rows={3}
-                    placeholder="Describe your specific scenario..."
+                    placeholder="Describe your specific scenario (e.g., 'rain', 'fire', 'power outage')..."
+                    value={scenario}
+                    onChange={(e) => setScenario(e.target.value)}
                   />
                 </Box>
 
@@ -367,9 +458,9 @@ www.crowdshield.com
                   Quick Scenarios
                 </Typography>
 
-                {scenarios.map((scenario) => (
+                {scenarios.map((scenarioItem) => (
                   <Paper
-                    key={scenario.id}
+                    key={scenarioItem.id}
                     sx={{
                       p: 2,
                       mb: 2,
@@ -379,32 +470,33 @@ www.crowdshield.com
                       cursor: "pointer",
                       "&:hover": {
                         boxShadow: 2,
-                        borderColor: scenario.color,
+                        borderColor: scenarioItem.color,
                       },
                     }}
+                    onClick={() => setScenario(scenarioItem.name.toLowerCase())}
                   >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Avatar sx={{ bgcolor: scenario.color }}>
-                        {scenario.icon}
+                      <Avatar sx={{ bgcolor: scenarioItem.color }}>
+                        {scenarioItem.icon}
                       </Avatar>
                       <Box sx={{ flexGrow: 1 }}>
                         <Typography
                           variant="subtitle2"
                           sx={{ fontWeight: "bold" }}
                         >
-                          {scenario.name}
+                          {scenarioItem.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {scenario.description}
+                          {scenarioItem.description}
                         </Typography>
                       </Box>
                       <Chip
-                        label={scenario.complexity}
+                        label={scenarioItem.complexity}
                         size="small"
                         color={
-                          scenario.complexity === "High"
+                          scenarioItem.complexity === "High"
                             ? "error"
-                            : scenario.complexity === "Medium"
+                            : scenarioItem.complexity === "Medium"
                             ? "warning"
                             : "success"
                         }
@@ -432,11 +524,39 @@ www.crowdshield.com
                     Simulation Results
                   </Typography>
                   <Chip
-                    label="Last Run: 2 min ago"
-                    color="success"
+                    label={analysisResult ? "Analysis Complete" : "No Analysis"}
+                    color={analysisResult ? "success" : "default"}
                     size="small"
                   />
                 </Box>
+
+                {/* Analysis Result Display */}
+                {analysisResult && (
+                  <Paper
+                    sx={{
+                      p: 3,
+                      mb: 3,
+                      borderRadius: 2,
+                      bgcolor: "primary.light",
+                      color: "primary.contrastText",
+                      height: "100%",
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
+                      AI Analysis Result
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Situation:</strong> {analysisResult.situation}
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 1 }}>
+                      <strong>Estimated Impact:</strong>{" "}
+                      {analysisResult.estimated_count} people affected
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Response Plan:</strong> {analysisResult.plan}
+                    </Typography>
+                  </Paper>
+                )}
 
                 <Grid container spacing={2}>
                   {simulationResults.map((result, index) => (
