@@ -28,7 +28,7 @@ import {
   Download,
 } from "@mui/icons-material";
 import DashboardSidebar from "../components/DashboardSidebar";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import DashboardAPI from "../api/dashboardAPI";
 
 // Type definitions
@@ -54,6 +54,85 @@ const WhatIfPage = () => {
     null
   );
   const [loading, setLoading] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+
+  // Generate 10 mock recommendations
+  const getAllRecommendations = useCallback(
+    () => [
+      {
+        type: "critical",
+        title: "Increase Crew Count",
+        description: "Add 15 more crew members to maintain safety standards",
+        priority: "High",
+      },
+      {
+        type: "warning",
+        title: "Modify Evacuation Routes",
+        description: "Implement alternative exit strategies for better flow",
+        priority: "Medium",
+      },
+      {
+        type: "success",
+        title: "Install Additional Sensors",
+        description:
+          "Deploy 5 more crowd density sensors in high-traffic areas",
+        priority: "Low",
+      },
+      {
+        type: "critical",
+        title: "Emergency Medical Station",
+        description:
+          "Set up additional medical tent near Zone B for faster response",
+        priority: "High",
+      },
+      {
+        type: "warning",
+        title: "Crowd Control Barriers",
+        description:
+          "Install temporary barriers to manage crowd flow during peak hours",
+        priority: "Medium",
+      },
+      {
+        type: "success",
+        title: "Communication Upgrade",
+        description:
+          "Deploy 3 additional radio units for better crew coordination",
+        priority: "Low",
+      },
+      {
+        type: "critical",
+        title: "Security Checkpoint Expansion",
+        description: "Add 2 more security lanes to reduce entry wait times",
+        priority: "High",
+      },
+      {
+        type: "warning",
+        title: "Weather Monitoring System",
+        description: "Install real-time weather alerts for outdoor event areas",
+        priority: "Medium",
+      },
+      {
+        type: "success",
+        title: "Food Vendor Relocation",
+        description: "Move food stalls to reduce congestion in main walkways",
+        priority: "Low",
+      },
+      {
+        type: "critical",
+        title: "Fire Safety Equipment",
+        description: "Add 5 more fire extinguishers in high-risk areas",
+        priority: "High",
+      },
+    ],
+    []
+  );
+
+  // Function to randomly select 3 recommendations
+  const getRandomRecommendations = useCallback(() => {
+    const allRecommendations = getAllRecommendations();
+    const shuffled = [...allRecommendations].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  }, [getAllRecommendations]);
 
   const runWhatIfAnalysis = async () => {
     if (!scenario.trim()) {
@@ -63,6 +142,10 @@ const WhatIfPage = () => {
 
     try {
       setLoading(true);
+
+      // Generate new random recommendations when API is called
+      setRecommendations(getRandomRecommendations());
+
       const result = await DashboardAPI.getWhatIfAnalysis(scenario);
       setAnalysisResult(result);
     } catch (error) {
@@ -238,27 +321,6 @@ www.crowdshield.com
   };
 
   const simulationResults = getSimulationResults();
-
-  const recommendations = [
-    {
-      type: "critical",
-      title: "Increase Crew Count",
-      description: "Add 15 more crew members to maintain safety standards",
-      priority: "High",
-    },
-    {
-      type: "warning",
-      title: "Modify Evacuation Routes",
-      description: "Implement alternative exit strategies for better flow",
-      priority: "Medium",
-    },
-    {
-      type: "success",
-      title: "Install Additional Sensors",
-      description: "Deploy 5 more crowd density sensors in high-traffic areas",
-      priority: "Low",
-    },
-  ];
 
   return (
     <Box
@@ -609,63 +671,65 @@ www.crowdshield.com
               </CardContent>
             </Card>
 
-            {/* Recommendations */}
-            <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3 }}>
-                  Recommendations
-                </Typography>
+            {/* Recommendations - Only show after API call */}
+            {recommendations.length > 0 && (
+              <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: "bold", mb: 3 }}>
+                    Recommendations
+                  </Typography>
 
-                {recommendations.map((rec, index) => (
-                  <Paper
-                    key={index}
-                    sx={{
-                      p: 3,
-                      mb: 2,
-                      borderRadius: 2,
-                      border: "1px solid",
-                      borderColor:
-                        rec.type === "critical"
-                          ? "critical.main"
-                          : rec.type === "warning"
-                          ? "warning.main"
-                          : "safe.main",
-                    }}
-                  >
-                    <Box
+                  {recommendations.map((rec, index) => (
+                    <Paper
+                      key={index}
                       sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        p: 3,
+                        mb: 2,
+                        borderRadius: 2,
+                        border: "1px solid",
+                        borderColor:
+                          rec.type === "critical"
+                            ? "critical.main"
+                            : rec.type === "warning"
+                            ? "warning.main"
+                            : "safe.main",
                       }}
                     >
-                      <Box>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ fontWeight: "bold", mb: 1 }}
-                        >
-                          {rec.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {rec.description}
-                        </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: "bold", mb: 1 }}
+                          >
+                            {rec.title}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {rec.description}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={rec.priority}
+                          color={
+                            rec.priority === "High"
+                              ? "error"
+                              : rec.priority === "Medium"
+                              ? "warning"
+                              : "success"
+                          }
+                          sx={{ fontWeight: "bold" }}
+                        />
                       </Box>
-                      <Chip
-                        label={rec.priority}
-                        color={
-                          rec.priority === "High"
-                            ? "error"
-                            : rec.priority === "Medium"
-                            ? "warning"
-                            : "success"
-                        }
-                        sx={{ fontWeight: "bold" }}
-                      />
-                    </Box>
-                  </Paper>
-                ))}
-              </CardContent>
-            </Card>
+                    </Paper>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
           </Grid>
         </Grid>
       </Box>
